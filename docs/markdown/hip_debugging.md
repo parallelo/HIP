@@ -65,7 +65,7 @@ Some key information from the trace above.
 Chicken bits are environment variables which cause the HIP, HCC, or HSA driver to disable some feature or optimization.
 These are not intended for production but can be useful diagnose synchronization problems in the application (or driver).
 
-Some of the most useful chicken bits are described here. These bits are supported on the ROCm path:
+A current list of environment variables can be listed by setting `HIP_PRINT_ENV=1`.  Some of the most useful chicken bits are described here. These bits are supported on the ROCm path:
 
 HIP provides 3 environment variables in the HIP_*_BLOCKING family.  These introduce additional synchronization and can be useful to isolate synchronization problems. Specifically, if the code works with this flag set, then it indicates the kernels are executing correctly, and any failures likely are causes by improper or missing synchronization.  These flags will have performance impact and are not intended for production use.
 
@@ -74,7 +74,7 @@ HIP provides 3 environment variables in the HIP_*_BLOCKING family.  These introd
 - HIP_API_BLOCKING : Forces hipMemcpyAsync and hipMemsetAsync to be host-synchronous, meaning they will wait for the requested operation to complete before returning to the caller.
 
 These options cause HCC to serialize.  Useful if you have libraries or code which is calling HCC kernels directly rather than using HIP.  
-- HCC_SERIALZIE_KERNELS : 0x1=pre-serialize before each kernel launch, 0x2=post-serialize after each kernel launch., 0x3= pre- and post- serialize.
+- HCC_SERIALIZE_KERNEL : 0x1=pre-serialize before each kernel launch, 0x2=post-serialize after each kernel launch., 0x3= pre- and post- serialize.
 - HCC_SERIALIZE_COPY    : 0x1=pre-serialize before each async copy, 0x2=post-serialize after each async copy., 0x3= pre- and post- serialize.
 
 - HSA_ENABLE_SDMA=0     : Causes host-to-device and device-to-host copies to use compute shader blit kernels rather than the dedicated DMA copy engines.  Compute shader copies have low latency (typically < 5us) and can achieve approximately 80% of the bandwidth of the DMA copy engine.  This flag is useful to isolate issues with the hardware copy engines.
