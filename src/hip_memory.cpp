@@ -1589,7 +1589,7 @@ hipError_t ihipMemset(void* dst, int  value, size_t sizeBytes, hipStream_t strea
     return e;
 };
 
-hipError_t getLockedPointer(const void *hostPtr, size_t dataLen, void **devicePtrPtr)
+hipError_t getLockedPointer(void *hostPtr, size_t dataLen, void **devicePtrPtr)
 {
         hc::accelerator acc;
 
@@ -1600,7 +1600,8 @@ hipError_t getLockedPointer(const void *hostPtr, size_t dataLen, void **devicePt
 #endif
         am_status_t status = hc::am_memtracker_getinfo(&amPointerInfo, hostPtr);
         if (status == AM_SUCCESS) {
-            *devicePtrPtr =  (char*)amPointerInfo._devicePointer;
+            *devicePtrPtr = static_cast<char*>(amPointerInfo._devicePointer) +
+                (static_cast<char*>(hostPtr) - static_cast<char*>(amPointerInfo._hostPointer));
             return(hipSuccess);
         };
         return(hipErrorHostMemoryNotRegistered);
@@ -1667,6 +1668,7 @@ hipError_t hipMemcpy2DAsync(void* dst, size_t dpitch, const void* src, size_t sp
     void *pinnedPtr=NULL;
     void *actualSrc = (void*)src;
     void *actualDest = dst;
+    stream = ihipSyncAndResolveStream(stream);
     if(kind == hipMemcpyHostToDevice ) {
         if(getLockedPointer((void*)src, spitch, &pinnedPtr) == hipSuccess ){
             isLocked = 1;
