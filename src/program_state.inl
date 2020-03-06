@@ -225,6 +225,7 @@ public:
 
                 const auto elf = (info->dlpi_addr && std::strlen(info->dlpi_name) != 0) ?
                     info->dlpi_name : "/proc/self/exe";
+                printf("program_state.inl - get_code_object_blobs() - dlpi_name: %s\n", info->dlpi_name);
 
                 if (!tmp.load(elf)) return 0;
 
@@ -578,7 +579,10 @@ public:
             static const auto copy_kernels = [](
                 hsa_executable_t, hsa_agent_t a, hsa_executable_symbol_t x, void* p) {
                 auto& impl = *static_cast<program_state_impl*>(p);
-                if (type(x) == HSA_SYMBOL_KIND_KERNEL) impl.kernels[a].second[hip_impl::name(x)].push_back(x);
+                if (type(x) == HSA_SYMBOL_KIND_KERNEL) {
+                    printf("program_state.inl - get_kernels() - kernel name: %s\n", hip_impl::name(x).c_str());
+                    impl.kernels[a].second[hip_impl::name(x)].push_back(x);
+                }
 
                 return HSA_STATUS_SUCCESS;
             };
